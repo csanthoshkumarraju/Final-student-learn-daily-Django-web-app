@@ -1,0 +1,145 @@
+{% extends "studentloginbase.html" %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'studenthomework.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+{% endblock css %}
+
+{% block content %}
+
+<section class="Student-Homework-section">
+    <h2 class="home-work-heading">Home Work</h2>
+
+    <div class="add-homework-form">
+        <form class="add-form" method="post">
+            {% csrf_token %}
+            <h3 class="ahw-H">Add Home Work</h3>
+            <div class="form-row">
+                <label for="sname" class="label">Subject Name:</label>
+                {{ form.subject_name }}
+            </div>
+            <div class="form-row">
+                <label for="tname" class="label">Topic Name:</label>
+                {{ form.topic_name }}
+            </div>
+            <input type="submit" value="Add Home Work" class="submit-button" name="add_homework">
+        </form>
+    </div>
+    
+    <div class="list-of-home-work">
+        <h3 class="lohwh">List of Homework to Do Today</h3>
+        {% if todos %}
+            <table class="list-hw-table">
+                <tr>
+                    <th>Subject</th>
+                    <th>Topic</th>
+                    <th>Mark as In Progress</th>
+                    <th>Date Added</th>
+                </tr>
+                {% for homework in todos %}
+                    <tr>
+                        <td>{{ homework.subject_name }}</td>
+                        <td>{{ homework.topic_name }}</td>
+                        <td>
+                            <form method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="homework_id" value="{{ homework.id }}">
+                                <button type="submit" name="mark_in_progress" class="In-Progress-btn">In Progress</button>
+                            </form>
+                        </td>
+                        <td>{{ homework.date|date:"d/m/Y" }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>No homework to do yet.</p>
+        {% endif %}
+    </div>
+    
+    <div class="homework-in-progress">
+        <h3 class="HIPH">Homework in Progress</h3>
+        <table class="home-work-in-progress-tb">
+            <tr>
+                <th>Subject</th>
+                <th>Topic</th>
+                <th>Mark as Completed</th>
+                <th>Date In Progress</th>
+            </tr>
+            {% if in_progress %}
+                {% for homework in in_progress %}
+                    <tr>
+                        <td>{{ homework.subject_name }}</td>
+                        <td>{{ homework.topic_name }}</td>
+                        <td>
+                            <form method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="homework_id" value="{{ homework.id }}">
+                                <button type="submit" name="mark_completed" class="Complete-btn">Completed</button>
+                            </form>
+                        </td>
+                        <td>{{ homework.date|date:"d/m/Y" }}</td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <p>No homework in progress.</p>
+            {% endif %}
+        </table>
+    </div>
+    
+    <div class="search-day-homework">
+        <h3 class="SCHDH"> Search Completed Homework by Date</h3>
+        <form class="SHD-form" method="get">
+            <label for="homework-date">Search Homework by Date:</label>
+            <input type="date" id="homework-date" name="homework-date" value="{{ search_date|date:'Y-m-d' }}" required>
+            <button type="submit" class="Search-btn">Search</button>
+        </form>
+        <h3 class="SCHDH">Completed Homework on {{ search_date|date:"d/m/Y" }}</h3>
+        <table class="particular-day-home-work-tb">
+            <tr>
+                <th>Subject</th>
+                <th>Topic</th>
+            </tr>
+            {% if completed_homework %}
+                {% for homework in completed_homework %}
+                    <tr>
+                        <td>{{ homework.subject_name }}</td>
+                        <td>{{ homework.topic_name }}</td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="2">No completed homework for this date.</td>
+                </tr>
+            {% endif %}
+        </table>
+    </div>
+
+    <div class="completed-homework">
+        <h3 class="ACHH">All Completed Homework</h3>
+        <table class="ACH-tb">
+            <tr>
+                <th>Subject</th>
+                <th>Topic</th>
+                <th>Completion Date</th>
+            </tr>
+            {% if all_completed_homework %}
+                {% for homework in all_completed_homework %}
+                    <tr>
+                        <td>{{ homework.subject_name }}</td>
+                        <td>{{ homework.topic_name }}</td>
+                        <td>{{ homework.date|date:"d/m/Y" }}</td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="3">No completed homework.</td>
+                </tr>
+            {% endif %}
+        </table>
+    </div>
+</section>
+
+{% endblock %}
+
